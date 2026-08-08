@@ -5,7 +5,9 @@
 #include "constants.h"
 #include "audio.h"
 #include "button.h"
+#include "charge.h"
 #include "led.h"
+#include "state.h"
 
 void setup() {
     pinMode(BUTTON_1, INPUT_PULLUP);
@@ -21,7 +23,9 @@ void setup() {
 
     xTaskCreate(AudioTask, "AudioTask", 2048, NULL, 1, NULL);
     xTaskCreate(ButtonTask, "ButtonTask", 1024, NULL, 1, NULL);
+    xTaskCreate(ChargeTask, "ChargeTask", 1024, NULL, 1, NULL);
     xTaskCreate(LEDTask, "LEDTask", 1024, NULL, 1, NULL);
+    xTaskCreate(StateTask, "StateTask", 1024, NULL, 1, NULL);
 }
 
 void loop() {
