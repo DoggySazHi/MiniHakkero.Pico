@@ -1,0 +1,27 @@
+#include <Arduino.h>
+#include <FreeRTOS.h>
+#include <task.h>
+
+#include "constants.h"
+#include "audio.h"
+#include "button.h"
+
+void setup() {
+    pinMode(BUTTON_1, INPUT_PULLUP);
+    pinMode(BUTTON_2, INPUT_PULLUP);
+    pinMode(BUTTON_3, INPUT_PULLUP);
+    pinMode(BUTTON_4, INPUT_PULLUP);
+
+    pinMode(SPEAKER_SDA, OUTPUT);
+    pinMode(SPEAKER_SCL, OUTPUT);
+    pinMode(SPEAKER_LRC, OUTPUT);
+
+    pinMode(WS2812B_DIN, OUTPUT);
+
+    xTaskCreate(AudioTask, "AudioTask", 2048, NULL, 1, NULL);
+    xTaskCreate(ButtonTask, "ButtonTask", 1024, NULL, 1, NULL);
+}
+
+void loop() {
+    // FreeRTOS lmao!
+}
