@@ -29,14 +29,12 @@ void LEDTask(void *pvParameters) {
 }
 
 void led_state_off() {
-    LEDTaskState::ledState = LED_OFF;
     FastLED.clear();
     FastLED.show();
 }
 
 void led_state_ready() {
     // Rainbow pattern for the outer ring
-    LEDTaskState::ledState = LED_READY;
     for (int i = 0; i < WS2812B_LED_OUTER; ++i) {
         LEDTaskState::leds[i] = CHSV((i * 255) / WS2812B_LED_OUTER, 255, 255); // Rainbow
     }
@@ -46,7 +44,6 @@ void led_state_ready() {
 
 void led_state_fire() {
     // All white, with some rainbow on the outer ring
-    LEDTaskState::ledState = LED_FIRE;
     for (int i = 0; i < WS2812B_LED_OUTER; ++i) {
         LEDTaskState::leds[i] = CHSV((i * 255) / WS2812B_LED_OUTER, 255, 255); // Rainbow
     }
