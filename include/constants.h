@@ -35,3 +35,9 @@
  * WS2812B LED pin
  */
 #define WS2812B_DIN 8
+// Number of LEDs in the outer ring (ready)
+#define WS2812B_LED_OUTER 8
+// Number of LEDs in the inner ring (firing)
+#define WS2812B_LED_INNER 8
+
+#define WS2812B_LED_TOTAL (WS2812B_LED_OUTER + WS2812B_LED_INNER)
