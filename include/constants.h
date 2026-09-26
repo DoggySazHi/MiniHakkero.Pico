@@ -13,6 +13,7 @@
 // Physical buttons
 #define BUTTON_1 20
 #define BUTTON_2 21
+#define BUTTON_5 10
 
 // Touch-capacitive buttons
 #define BUTTON_3 12
@@ -35,6 +36,7 @@
  * WS2812B LED pin
  */
 #define WS2812B_DIN 8
+#define WS2812B_EN 11
 // Number of LEDs in the outer ring (ready)
 #define WS2812B_LED_OUTER 8
 // Number of LEDs in the inner ring (firing)

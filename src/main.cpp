@@ -20,6 +20,7 @@ void setup() {
     pinMode(SPEAKER_LRC, OUTPUT);
 
     pinMode(WS2812B_DIN, OUTPUT);
+    pinMode(WS2812B_EN, OUTPUT);
 
     xTaskCreate(AudioTask, "AudioTask", 2048, NULL, 1, NULL);
     xTaskCreate(ButtonTask, "ButtonTask", 1024, NULL, 1, NULL);
