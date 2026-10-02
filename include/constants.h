@@ -2,9 +2,9 @@
  * Voltage sense pins (analog)
  */
 
-#define BAT_SENSE 0
-#define STAT_SENSE 1
-#define USB_SENSE 2
+#define BAT_SENSE 26
+#define STAT_SENSE 27
+#define USB_SENSE 28
 
 /*
  * Buttons

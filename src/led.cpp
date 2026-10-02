@@ -31,21 +31,21 @@ void LEDTask(void *pvParameters) {
 }
 
 void led_state_off() {
-    FastLED.clear(true);
-
-    digitalWrite(WS2812B_EN, HIGH);
-
     if (ChargeTaskState::chargeState == CHARGE_CHARGING) {
         // If charging, show a pulsing red light on the inner ring
+        digitalWrite(WS2812B_EN, HIGH);
         uint8_t brightness = (sin(millis() / 1000.0 * 2 * PI) + 1) / 2 * 40; // Pulsing effect
         for (int i = WS2812B_LED_OUTER; i < WS2812B_LED_TOTAL; ++i) {
             LEDTaskState::leds[i] = CRGB(brightness, 0, 0); // Red
         }
+        FastLED.show();
     } else if (ChargeTaskState::chargeState == CHARGE_FULLY_CHARGED) {
         // If fully charged, show a solid green light on the inner ring
+        digitalWrite(WS2812B_EN, HIGH);
         for (int i = WS2812B_LED_OUTER; i < WS2812B_LED_TOTAL; ++i) {
             LEDTaskState::leds[i] = CRGB(0, 40, 0); // Green
         }
+        FastLED.show();
     } else {
         digitalWrite(WS2812B_EN, LOW); // Turn off the LED ring if not charging
         digitalWrite(WS2812B_DIN, LOW); // Ensure the data line is low (avoid quiescent current)

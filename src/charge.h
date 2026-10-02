@@ -1,9 +1,10 @@
 #ifndef CHARGE_H
 #define CHARGE_H
 
-#define CHARGE_INPUT_THRESHOLD 1000
+#define CHARGE_INPUT_THRESHOLD 500
 
 void ChargeTask(void *pvParameters);
+float toVoltage(int adcValue);
 
 enum ChargeState {
     CHARGE_NOT_CHARGING,
@@ -14,6 +15,9 @@ enum ChargeState {
 class ChargeTaskState {
 public:
     static ChargeState chargeState;
+    static int batterySenseReading;
+    static int statSenseReading;
+    static int usbSenseReading;
 };
 
 #endif // CHARGE_H

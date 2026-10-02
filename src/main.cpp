@@ -8,6 +8,7 @@
 #include "charge.h"
 #include "led.h"
 #include "state.h"
+#include "debug.h"
 
 void setup() {
     pinMode(BUTTON_1, INPUT_PULLUP);
@@ -27,6 +28,7 @@ void setup() {
     xTaskCreate(ChargeTask, "ChargeTask", 1024, NULL, 1, NULL);
     xTaskCreate(LEDTask, "LEDTask", 1024, NULL, 1, NULL);
     xTaskCreate(StateTask, "StateTask", 1024, NULL, 1, NULL);
+    xTaskCreate(DebugTask, "DebugTask", 1024, NULL, 1, NULL);
 }
 
 void loop() {
