@@ -12,10 +12,10 @@ bool StateMachine::buttonHeld = false;
 
 void StateTask(void *pvParameters) {
     while (1) {
-        if (ButtonTaskState::buttons[0] && !StateMachine::buttonHeld) {
+        if (ButtonTaskState::buttons[2] && !StateMachine::buttonHeld) {
             nextState();
             StateMachine::buttonHeld = true;
-        } else if (!ButtonTaskState::buttons[0]) {
+        } else if (!ButtonTaskState::buttons[2]) {
             StateMachine::buttonHeld = false;
         }
 

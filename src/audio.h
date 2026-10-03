@@ -3,9 +3,10 @@
 
 #include <Arduino.h>
 
-#define AUDIO_FILE_PATH "master_spark.wav"
-#define AUDIO_FILE_SAMPLE_RATE 48000
+#define AUDIO_FILE_NAME "master_spark.wav"
 #define AUDIO_BUFFER_SIZE 1024
+// 0-100, does not go over 100 because no clamping
+#define AUDIO_VOLUME_PERCENT 50
 
 void AudioTask(void *pvParameters);
 
