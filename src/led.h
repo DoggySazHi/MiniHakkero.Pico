@@ -5,6 +5,7 @@
 #include <FastLED.h>
 
 #include "constants.h"
+#include "charge.h"
 
 enum LEDState {
     LED_OFF,
@@ -23,6 +24,7 @@ class LEDTaskState {
 public:
     static CRGB leds[WS2812B_LED_TOTAL];
     static LEDState ledState;
+    static ChargeState previousChargeState;
 };
 
 #endif // LED_H

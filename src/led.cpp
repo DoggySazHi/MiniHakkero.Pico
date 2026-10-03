@@ -7,6 +7,8 @@
 
 CRGB LEDTaskState::leds[WS2812B_LED_TOTAL];
 LEDState LEDTaskState::ledState = LED_OFF;
+// We initiaialize it to charging so it'll shut down the LEDs on bootup if the device is not charging
+ChargeState LEDTaskState::previousChargeState = ChargeState::CHARGE_CHARGING;
 
 void LEDTask(void *pvParameters) {
     FastLED.addLeds<NEOPIXEL, WS2812B_DIN>(LEDTaskState::leds, WS2812B_LED_TOTAL);
@@ -31,24 +33,35 @@ void LEDTask(void *pvParameters) {
 }
 
 void led_state_off() {
+    FastLED.clear();
+
+    if (LEDTaskState::previousChargeState != ChargeTaskState::chargeState) {
+        // Check if we need to turn off/on the LED rings
+        if (ChargeTaskState::chargeState == CHARGE_NOT_CHARGING) {
+            FastLED.clear(true);
+            digitalWrite(WS2812B_EN, LOW);
+        } else {
+            digitalWrite(WS2812B_EN, HIGH);
+        }
+
+        LEDTaskState::previousChargeState = ChargeTaskState::chargeState;
+    }
+
     if (ChargeTaskState::chargeState == CHARGE_CHARGING) {
         // If charging, show a pulsing red light on the inner ring
-        digitalWrite(WS2812B_EN, HIGH);
-        uint8_t brightness = (sin(millis() / 1000.0 * 2 * PI) + 1) / 2 * 40; // Pulsing effect
+        FastLED.clear();
+        uint8_t brightness = (sin(millis() / 1000.0 * 2 * PI) + 1) / 2 * 10; // Pulsing effect
         for (int i = WS2812B_LED_OUTER; i < WS2812B_LED_TOTAL; ++i) {
             LEDTaskState::leds[i] = CRGB(brightness, 0, 0); // Red
         }
         FastLED.show();
     } else if (ChargeTaskState::chargeState == CHARGE_FULLY_CHARGED) {
+        FastLED.clear();
         // If fully charged, show a solid green light on the inner ring
-        digitalWrite(WS2812B_EN, HIGH);
         for (int i = WS2812B_LED_OUTER; i < WS2812B_LED_TOTAL; ++i) {
-            LEDTaskState::leds[i] = CRGB(0, 40, 0); // Green
+            LEDTaskState::leds[i] = CRGB(0, 10, 0); // Green
         }
         FastLED.show();
-    } else {
-        digitalWrite(WS2812B_EN, LOW); // Turn off the LED ring if not charging
-        digitalWrite(WS2812B_DIN, LOW); // Ensure the data line is low (avoid quiescent current)
     }
 }
 
@@ -58,6 +71,10 @@ void led_state_ready() {
         uint8_t hue = (i * 255) / WS2812B_LED_OUTER;
         hue = (hue + (millis() / 10)) % 255;
         LEDTaskState::leds[i] = CHSV(hue, 255, 255);
+    }
+
+    for (int i = WS2812B_LED_OUTER; i < WS2812B_LED_TOTAL; ++i) {
+        LEDTaskState::leds[i] = CRGB::Black;
     }
 
     FastLED.show();
@@ -72,7 +89,7 @@ void led_state_fire() {
     }
     
     for (int i = WS2812B_LED_OUTER; i < WS2812B_LED_TOTAL; ++i) {
-        LEDTaskState::leds[i] = CRGB::White; // White
+        LEDTaskState::leds[i] = CRGB::White;
     }
 
     FastLED.show();
