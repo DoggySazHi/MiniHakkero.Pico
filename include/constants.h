@@ -13,6 +13,7 @@
 // Physical buttons
 #define BUTTON_1 20
 #define BUTTON_2 21
+// Not actually used, just... exists?
 #define BUTTON_5 10
 
 // Touch-capacitive buttons

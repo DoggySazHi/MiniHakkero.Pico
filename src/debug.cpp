@@ -34,5 +34,14 @@ void DebugTask(void *pvParameters) {
             ButtonTaskState::buttons[1],
             ButtonTaskState::buttons[2],
             ButtonTaskState::buttons[3]);
+        Serial.printf("- Touch (ticks): %d/%d (base %d, press >%d), %d/%d (base %d, press >%d)\n",
+            ButtonTaskState::touchReading[0],
+            ButtonTaskState::touchReleaseThreshold[0],
+            ButtonTaskState::touchBaseline[0],
+            ButtonTaskState::touchPressThreshold[0],
+            ButtonTaskState::touchReading[1],
+            ButtonTaskState::touchReleaseThreshold[1],
+            ButtonTaskState::touchBaseline[1],
+            ButtonTaskState::touchPressThreshold[1]);
     }
 }

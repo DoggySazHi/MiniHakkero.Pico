@@ -13,8 +13,8 @@
 void setup() {
     pinMode(BUTTON_1, INPUT_PULLUP);
     pinMode(BUTTON_2, INPUT_PULLUP);
-    pinMode(BUTTON_3, INPUT_PULLUP);
-    pinMode(BUTTON_4, INPUT_PULLUP);
+    pinMode(BUTTON_3, INPUT);
+    pinMode(BUTTON_4, INPUT);
 
     pinMode(SPEAKER_SDA, OUTPUT);
     pinMode(SPEAKER_SCL, OUTPUT);
