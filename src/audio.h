@@ -9,7 +9,7 @@
 #define AUDIO_VOLUME_PERCENT 100
 // 1 for loop, 0 for no loop
 // Useful for testing if you soldered the MAX98357A correctly...
-#define AUDIO_LOOP 1
+#define AUDIO_LOOP 0
 // Control SD_MODE to save power, but it gets angry if you send audio too early or cut it out mid-playback
 #define AUDIO_AMP_STARTUP_MS 5
 #define AUDIO_AMP_SHUTDOWN_MS 100

@@ -24,6 +24,7 @@ class LEDTaskState {
 public:
     static CRGB leds[WS2812B_LED_TOTAL];
     static LEDState ledState;
+    static LEDState previousLedState;
     static ChargeState previousChargeState;
 };
 

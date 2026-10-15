@@ -7,6 +7,7 @@
 
 CRGB LEDTaskState::leds[WS2812B_LED_TOTAL];
 LEDState LEDTaskState::ledState = LED_OFF;
+LEDState LEDTaskState::previousLedState = LED_OFF;
 // We initiaialize it to charging so it'll shut down the LEDs on bootup if the device is not charging
 ChargeState LEDTaskState::previousChargeState = ChargeState::CHARGE_CHARGING;
 
@@ -28,6 +29,7 @@ void LEDTask(void *pvParameters) {
                 break;
         }
 
+        LEDTaskState::previousLedState = LEDTaskState::ledState;
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
@@ -35,7 +37,7 @@ void LEDTask(void *pvParameters) {
 void led_state_off() {
     FastLED.clear();
 
-    if (LEDTaskState::previousChargeState != ChargeTaskState::chargeState) {
+    if (LEDTaskState::previousChargeState != ChargeTaskState::chargeState || LEDTaskState::previousLedState != LEDTaskState::ledState) {
         // Check if we need to turn off/on the LED rings
         if (ChargeTaskState::chargeState == CHARGE_NOT_CHARGING) {
             FastLED.clear(true);
@@ -66,6 +68,8 @@ void led_state_off() {
 }
 
 void led_state_ready() {
+    digitalWrite(WS2812B_EN, HIGH);
+
     // Rainbow pattern for the outer ring
     for (int i = 0; i < WS2812B_LED_OUTER; ++i) {
         uint8_t hue = (i * 255) / WS2812B_LED_OUTER;
@@ -81,6 +85,8 @@ void led_state_ready() {
 }
 
 void led_state_fire() {
+    digitalWrite(WS2812B_EN, HIGH);
+
     // All white, with some rainbow on the outer ring (darkened)
     for (int i = 0; i < WS2812B_LED_OUTER; ++i) {
         uint8_t hue = (i * 255) / WS2812B_LED_OUTER;
