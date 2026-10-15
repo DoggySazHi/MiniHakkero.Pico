@@ -32,6 +32,7 @@
 #define SPEAKER_SDA 2
 #define SPEAKER_SCL 3
 #define SPEAKER_LRC 4
+#define SPEAKER_SD 6
 
 /*
  * WS2812B LED pin

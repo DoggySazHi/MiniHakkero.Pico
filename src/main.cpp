@@ -19,6 +19,8 @@ void setup() {
     pinMode(SPEAKER_SDA, OUTPUT);
     pinMode(SPEAKER_SCL, OUTPUT);
     pinMode(SPEAKER_LRC, OUTPUT);
+    pinMode(SPEAKER_SD, OUTPUT);
+    digitalWrite(SPEAKER_SD, LOW);
 
     pinMode(WS2812B_DIN, OUTPUT);
     pinMode(WS2812B_EN, OUTPUT);

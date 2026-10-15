@@ -65,9 +65,13 @@ static WAVHeader parseWav(const uint8_t *&data, uint32_t &dataLength) {
             header.sampleRate = readLE32(body + 4);
             header.bits = readLE16(body + 14);
 
-            formatOk = header.format == 1;
+            formatOk =
+                header.format == 1 &&
+                (header.channels == 1 || header.channels == 2) &&
+                header.bits == 16;
+
             if (!formatOk) {
-                Serial.printf("Unexpected WAV format: fmt=%u ch=%u rate=%lu bits=%u\n", header.format, header.channels,
+                Serial.printf("Unexpected WAV format: fmt=%u (exp: 1) ch=%u (exp: 1 or 2) rate=%lu bits=%u (exp: 16)\n", header.format, header.channels,
                               (unsigned long) header.sampleRate, header.bits);
                 return garbageHeader;
             }
@@ -110,27 +114,61 @@ void AudioTask(void *pvParameters) {
     // LRCLK is automatically set to SPEAKER_SCL + 1, which is SPEAKER_LRC in this case
     i2s.setDATA(SPEAKER_SDA);
     i2s.setBitsPerSample(wavHeader.bits);
+    // Increase buffer size for 10ms task delay - honestly picked some random powers of 2 above defaults
+    i2s.setBuffers(8, 256);
     i2s.begin(wavHeader.sampleRate);
 
-    int16_t buffer[AUDIO_BUFFER_SIZE / sizeof(int16_t)];
+    // Library doesn't support mono, so we have to create stereo samples...
+    int16_t buffer[AUDIO_BUFFER_SIZE];
+    bool mono = wavHeader.channels == 1;
+    uint32_t bytesPerFrame = wavHeader.channels * sizeof(int16_t);
+
+    bool ampEnabled = false;
+    TickType_t lastPlayingTick = 0;
 
     while (1) {
         if (AudioTaskState::playing) {
-            uint32_t position = AudioTaskState::playbackPosition;
-            if (position < audioLength) {
-                size_t bytesToWrite = min((uint32_t) AUDIO_BUFFER_SIZE, audioLength - position);
-                size_t sampleCount = bytesToWrite / sizeof(int16_t);
-                const int16_t* samples = reinterpret_cast<const int16_t*>(audioData + position);
-                for (size_t i = 0; i < sampleCount; i++) {
-                    buffer[i] = (int32_t) samples[i] * AUDIO_VOLUME_PERCENT / 100;
-                }
-                i2s.write(reinterpret_cast<const uint8_t *>(buffer), sampleCount * sizeof(int16_t));
-                AudioTaskState::playbackPosition += bytesToWrite;
-            } else if (AUDIO_LOOP){
-                AudioTaskState::playbackPosition = 0;
-            } else {
-                AudioTaskState::stopPlayback();
+            if (!ampEnabled) {
+                digitalWrite(SPEAKER_SD, HIGH);
+                ampEnabled = true;
+                vTaskDelay(pdMS_TO_TICKS(AUDIO_AMP_STARTUP_MS));
             }
+            lastPlayingTick = xTaskGetTickCount();
+
+            // while loop is safe to copy as much as we can to the I2S buffer
+            while (AudioTaskState::playing && AudioTaskState::playbackPosition + bytesPerFrame <= audioLength) {
+                uint32_t position = AudioTaskState::playbackPosition;
+                size_t frameCount = min((uint32_t) AUDIO_BUFFER_SIZE, audioLength - position) / bytesPerFrame;
+                const int16_t* samples = reinterpret_cast<const int16_t*>(audioData + position);
+
+                for (size_t i = 0; i < frameCount * wavHeader.channels; i++) {
+                    int16_t sample = (int32_t) samples[i] * AUDIO_VOLUME_PERCENT / 100;
+                    if (mono) {
+                        buffer[2 * i] = sample;
+                        buffer[2 * i + 1] = sample;
+                    } else {
+                        buffer[i] = sample;
+                    }
+                }
+
+                size_t framesWritten = i2s.write(reinterpret_cast<const uint8_t*>(buffer), frameCount * 2 * sizeof(int16_t));
+                AudioTaskState::playbackPosition += framesWritten * bytesPerFrame;
+                if (framesWritten < frameCount) {
+                    break;
+                }
+            }
+
+            if (AudioTaskState::playbackPosition + bytesPerFrame > audioLength) {
+                if (AUDIO_LOOP) {
+                    AudioTaskState::playbackPosition = 0;
+                } else {
+                    AudioTaskState::stopPlayback();
+                }
+            }
+        } else if (ampEnabled && xTaskGetTickCount() - lastPlayingTick >= pdMS_TO_TICKS(AUDIO_AMP_SHUTDOWN_MS)) {
+            // vTaskDelay is not used here in case audio playback restarts before timeout
+            digitalWrite(SPEAKER_SD, LOW);
+            ampEnabled = false;
         }
 
         vTaskDelay(pdMS_TO_TICKS(10));
