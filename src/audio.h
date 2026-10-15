@@ -6,7 +6,7 @@
 #define AUDIO_FILE_NAME "master_spark_mono.wav"
 #define AUDIO_BUFFER_SIZE 1024
 // 0-100, does not go over 100 because no clamping
-#define AUDIO_VOLUME_PERCENT 50
+#define AUDIO_VOLUME_PERCENT 100
 
 void AudioTask(void *pvParameters);
 
