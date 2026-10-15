@@ -126,6 +126,8 @@ void AudioTask(void *pvParameters) {
                 }
                 i2s.write(reinterpret_cast<const uint8_t *>(buffer), sampleCount * sizeof(int16_t));
                 AudioTaskState::playbackPosition += bytesToWrite;
+            } else if (AUDIO_LOOP){
+                AudioTaskState::playbackPosition = 0;
             } else {
                 AudioTaskState::stopPlayback();
             }
